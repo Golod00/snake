@@ -53,20 +53,42 @@ class SnakeGame {
             this.addFood();
             this.addWall();
         } else {
-            this.food = [this.generateFood()];
+            this.food = [this.generateFood([...this.snake, ...this.walls])]; // Pass occupied positions
         }
     }
 
-    generateFood() {
-        return { x: Math.floor(Math.random() * this.gridSize), y: Math.floor(Math.random() * this.gridSize) };
+    // Updated generateFood function
+    generateFood(occupiedPositions = []) {
+        let food;
+        do {
+            food = {
+                x: Math.floor(Math.random() * this.gridSize),
+                y: Math.floor(Math.random() * this.gridSize)
+            };
+        } while (occupiedPositions.some(pos => pos.x === food.x && pos.y === food.y));
+        return food;
     }
 
+    // Updated addFood function
     addFood() {
-        this.food.push(this.generateFood());
+        const occupiedPositions = [...this.snake, ...this.walls];
+        this.food.push(this.generateFood(occupiedPositions));
     }
 
+    // Updated teleport function
+    teleport() {
+        const occupiedPositions = [...this.snake, ...this.walls];
+        const index = this.food.findIndex(foodItem => foodItem.x === this.snake[0].x && foodItem.y === this.snake[0].y);
+        if (index !== -1) {
+            this.food.splice(index, 1);
+        }
+        this.addFood(); // Add new food
+    }
+
+    // Updated addWall function
     addWall() {
-        this.walls.push(this.generateFood());
+        const occupiedPositions = [...this.snake, ...this.walls];
+        this.walls.push(this.generateFood(occupiedPositions));
     }
 
     drawSnake() {
@@ -153,12 +175,6 @@ class SnakeGame {
         } else {
             this.snake.pop();
         }
-    }
-
-    teleport() {
-        const index = this.food.findIndex(foodItem => foodItem.x === this.snake[0].x && foodItem.y === this.snake[0].y);
-        this.food.splice(index, 1);
-        this.addFood(); // Add new food
     }
 
     startGameLoop() {
