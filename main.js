@@ -10,7 +10,7 @@ class SnakeGame {
         });
         document.getElementById('game').appendChild(this.app.view);
 
-        this.gridSize = 20; // Fixed grid size of 20x20
+        this.gridSize = 20; // size of 20x20
         this.cellSize = screenWidth / this.gridSize; // Cell size based on screen size
         this.snake = [{ x: Math.floor(this.gridSize / 2), y: Math.floor(this.gridSize / 2) }];
         this.direction = 'right';
@@ -30,6 +30,7 @@ class SnakeGame {
         if (this.mode === 'walls') this.app.stage.addChild(this.wallGraphics);
 
         this.setupKeyListeners();
+        this.setupMobileControls();
         this.setupGameMode();
         this.startGameLoop();
         this.updateBestScoreDisplay();
@@ -42,6 +43,22 @@ class SnakeGame {
             else if (key === 'ArrowDown' && this.direction !== 'up') this.direction = 'down';
             else if (key === 'ArrowLeft' && this.direction !== 'right') this.direction = 'left';
             else if (key === 'ArrowRight' && this.direction !== 'left') this.direction = 'right';
+        });
+    }
+
+    setupMobileControls() {
+        // Управление с помощью кнопок
+        document.getElementById('up-btn').addEventListener('click', () => {
+            if (this.direction !== 'down') this.direction = 'up';
+        });
+        document.getElementById('down-btn').addEventListener('click', () => {
+            if (this.direction !== 'up') this.direction = 'down';
+        });
+        document.getElementById('left-btn').addEventListener('click', () => {
+            if (this.direction !== 'right') this.direction = 'left';
+        });
+        document.getElementById('right-btn').addEventListener('click', () => {
+            if (this.direction !== 'left') this.direction = 'right';
         });
     }
 
@@ -115,7 +132,6 @@ class SnakeGame {
             case 'right': head.x += 1; break;
         }
 
-        // Check for collision with walls or boundaries
         if (head.x < 0 || head.x >= this.gridSize || head.y < 0 || head.y >= this.gridSize) {
             if (this.mode === 'no-die') {
                 head.x = (head.x + this.gridSize) % this.gridSize;
@@ -131,7 +147,6 @@ class SnakeGame {
             return;
         }
 
-        // Check for collision with itself
         if (this.snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)) {
             this.endGame();
             return;
@@ -139,24 +154,23 @@ class SnakeGame {
 
         this.snake.unshift(head);
 
-        // Check if the snake has eaten any food
         const foodIndex = this.food.findIndex(foodItem => foodItem.x === head.x && foodItem.y === head.y);
         if (foodIndex !== -1) {
             this.score += 10;
             document.getElementById('current-score').innerText = this.score;
-            this.food.splice(foodIndex, 1); // Remove the eaten food from the array
+            this.food.splice(foodIndex, 1);
 
-            if (this.food.length === 0) { // If all food is eaten, add new food
+            if (this.food.length === 0) {
                 this.addFood();
             }
 
             if (this.mode === 'speed') {
-                this.speed *= 0.9; // Increase the speed
-                this.addFood(); // Add a new food item
+                this.speed *= 0.9;
+                this.addFood();
             } else if (this.mode === 'walls') {
-                this.addWall(); // Add a new wall
+                this.addWall();
             } else if (this.mode === 'portal') {
-                this.teleport(); // Move snake to second food
+                this.teleport();
             }
         } else {
             this.snake.pop();
@@ -167,8 +181,8 @@ class SnakeGame {
         const secondFood = this.food[1];
         if (secondFood) {
             this.snake[0] = { ...secondFood };
-            this.food.splice(1, 1); // Remove the second food
-            this.addFood(); // Add new second food
+            this.food.splice(1, 1);
+            this.addFood();
         }
     }
 
@@ -188,12 +202,10 @@ class SnakeGame {
     endGame() {
         this.isGameOver = true;
 
-        // Clear all graphics
         this.snakeGraphics.clear();
         this.foodGraphics.clear();
         if (this.mode === 'walls') this.wallGraphics.clear();
 
-        // Create a Game Over text
         const gameOverText = new PIXI.Text(`Game Over!\nYour score: ${this.score}`, {
             fontSize: 36,
             fill: 0xffffff,
@@ -205,9 +217,8 @@ class SnakeGame {
 
         this.app.stage.addChild(gameOverText);
 
-        // Save and display the best score
         this.saveBestScore();
-        this.updateBestScoreDisplay(); // Ensure best score is updated here as well
+        this.updateBestScoreDisplay();
     }
 
     saveBestScore() {
@@ -225,11 +236,24 @@ class SnakeGame {
         const bestScore = localStorage.getItem('bestScore') || 0;
         document.getElementById('best-score').innerText = bestScore;
     }
+
+    returnToMenu() {
+        // Clear the game and display the menu again
+        this.app.destroy();
+        document.getElementById('game').innerHTML = '';
+
+        document.getElementById('mode-selection').classList.remove('hidden');
+        document.getElementById('play-btn').classList.remove('hidden');
+        document.getElementById('menu-btn').classList.add('hidden');
+        document.getElementById('exit-btn').classList.add('hidden');
+    }
 }
+
+let snakeGameInstance;
 
 function startGame() {
     const mode = document.querySelector('input[name="mode"]:checked').value;
-    new SnakeGame(mode);
+    snakeGameInstance = new SnakeGame(mode);
 }
 
 document.getElementById('play-btn').addEventListener('click', () => {
@@ -240,5 +264,14 @@ document.getElementById('play-btn').addEventListener('click', () => {
     startGame();
 });
 
-document.getElementById('menu-btn').addEventListener('click', () => window.location.reload());
-document.getElementById('exit-btn').addEventListener('click', () => window.location.reload());
+document.getElementById('exit-btn').addEventListener('click', () => {
+    if (snakeGameInstance) {
+        snakeGameInstance.returnToMenu();
+    }
+});
+
+document.getElementById('menu-btn').addEventListener('click', () => {
+    if (snakeGameInstance) {
+        snakeGameInstance.returnToMenu();
+    }
+});
