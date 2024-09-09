@@ -1,0 +1,143 @@
+*,
+*::after,
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #1a1a1a;
+    color: #fff;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 10px;
+    overflow: hidden;
+}
+.hidden {
+    display: none;
+}
+.game-snake {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: #111;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.game-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 10px;
+    background: #222;
+    border-radius: 15px;
+
+}
+
+#game {
+    width: 400px;
+    max-width: 100%;
+    aspect-ratio: 1;
+    background: #000;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+#game canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+.gui {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.gui h3 {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.gui #best-score,
+.gui #current-score {
+    font-weight: bold;
+    color: #00ff00;
+}
+
+.buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+button {
+    padding: 12px 24px;
+    border: none;
+    color: #000;
+    font-size: 16px;
+    border-radius: 8px;
+    background-color: #00ff00;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s, transform 0.2s;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #00cc00;
+    transform: scale(1.05);
+}
+
+button.hidden {
+    display: none;
+}
+
+.game-modes {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.game-modes h4 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.game-modes label {
+    display: block;
+    margin: 5px 0;
+    font-size: 16px;
+    color: #ddd;
+}
+
+.game-modes input[type="radio"] {
+    margin-right: 10px;
+}
+
+@media (min-width: 992px) {
+    .game-main {
+        flex-direction: row;
+        gap: 50px;
+        align-items: flex-start;
+    }
+
+    #game {
+        width: 400px;
+        height: 400px;
+    }
+}
