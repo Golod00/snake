@@ -10,8 +10,8 @@ class SnakeGame {
         });
         document.getElementById('game').appendChild(this.app.view);
 
-        this.gridSize = screenWidth / 20; // Calculate grid size dynamically
-        this.cellSize = 20; // Cell size remains constant
+        this.gridSize = 20; // Fixed grid size of 20x20
+        this.cellSize = screenWidth / this.gridSize; // Cell size based on screen size
         this.snake = [{ x: Math.floor(this.gridSize / 2), y: Math.floor(this.gridSize / 2) }];
         this.direction = 'right';
         this.food = [];
@@ -153,6 +153,10 @@ class SnakeGame {
             if (this.mode === 'speed') {
                 this.speed *= 0.9; // Increase the speed
                 this.addFood(); // Add a new food item
+            } else if (this.mode === 'walls') {
+                this.addWall(); // Add a new wall
+            } else if (this.mode === 'portal') {
+                this.teleport(); // Move snake to second food
             }
         } else {
             this.snake.pop();
@@ -160,12 +164,12 @@ class SnakeGame {
     }
 
     teleport() {
-        const occupiedPositions = [...this.snake, ...this.walls];
-        const index = this.food.findIndex(foodItem => foodItem.x === this.snake[0].x && foodItem.y === this.snake[0].y);
-        if (index !== -1) {
-            this.food.splice(index, 1);
+        const secondFood = this.food[1];
+        if (secondFood) {
+            this.snake[0] = { ...secondFood };
+            this.food.splice(1, 1); // Remove the second food
+            this.addFood(); // Add new second food
         }
-        this.addFood(); // Add new food
     }
 
     startGameLoop() {
