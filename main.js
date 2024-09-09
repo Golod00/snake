@@ -53,11 +53,10 @@ class SnakeGame {
             this.addFood();
             this.addWall();
         } else {
-            this.food = [this.generateFood([...this.snake, ...this.walls])]; // Pass occupied positions
+            this.food = [this.generateFood()];
         }
     }
 
-    // Updated generateFood function
     generateFood(occupiedPositions = []) {
         let food;
         do {
@@ -69,23 +68,11 @@ class SnakeGame {
         return food;
     }
 
-    // Updated addFood function
     addFood() {
         const occupiedPositions = [...this.snake, ...this.walls];
         this.food.push(this.generateFood(occupiedPositions));
     }
 
-    // Updated teleport function
-    teleport() {
-        const occupiedPositions = [...this.snake, ...this.walls];
-        const index = this.food.findIndex(foodItem => foodItem.x === this.snake[0].x && foodItem.y === this.snake[0].y);
-        if (index !== -1) {
-            this.food.splice(index, 1);
-        }
-        this.addFood(); // Add new food
-    }
-
-    // Updated addWall function
     addWall() {
         const occupiedPositions = [...this.snake, ...this.walls];
         this.walls.push(this.generateFood(occupiedPositions));
@@ -157,24 +144,28 @@ class SnakeGame {
         if (foodIndex !== -1) {
             this.score += 10;
             document.getElementById('current-score').innerText = this.score;
-            if (this.mode === 'portal') {
-                this.teleport();
-            } else if (this.mode === 'walls') {
-                this.food.splice(foodIndex, 1); // Remove the eaten food from the array
+            this.food.splice(foodIndex, 1); // Remove the eaten food from the array
+
+            if (this.food.length === 0) { // If all food is eaten, add new food
                 this.addFood();
-                this.addWall();
-            } else if (this.mode === 'speed') {
-                this.speed *= 0.9;
-                this.addFood();
-            } else {
-                this.food.splice(foodIndex, 1); // Remove the eaten food from the array
-                if (this.food.length === 0) {
-                    this.addFood();
-                }
+            }
+
+            if (this.mode === 'speed') {
+                this.speed *= 0.9; // Increase the speed
+                this.addFood(); // Add a new food item
             }
         } else {
             this.snake.pop();
         }
+    }
+
+    teleport() {
+        const occupiedPositions = [...this.snake, ...this.walls];
+        const index = this.food.findIndex(foodItem => foodItem.x === this.snake[0].x && foodItem.y === this.snake[0].y);
+        if (index !== -1) {
+            this.food.splice(index, 1);
+        }
+        this.addFood(); // Add new food
     }
 
     startGameLoop() {
